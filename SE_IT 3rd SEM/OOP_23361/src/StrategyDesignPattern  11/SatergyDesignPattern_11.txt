@@ -1,0 +1,188 @@
+//23361_Dhiraj Mangaldas Wadile
+//SE-11(G-11)
+//Assignment No.11
+//OOP LAB
+
+CODE:-
+
+package StrategyDesignPattern;
+
+public interface PaymentStrategy {
+    public void pay(int amt);
+}
+
+
+package StrategyDesignPattern;
+
+import java.util.Scanner;
+
+public class CreditCardStrategy implements PaymentStrategy{
+
+    String name;
+    String cardNo;
+    int cvv,expDate;
+    CreditCardStrategy(){
+        getInfo();
+    }
+    Scanner sc = new Scanner(System.in);
+    public void getInfo(){
+        System.out.print("Enter your name: ");
+        name = sc.next();
+        System.out.print("Enter your Card number: ");
+        cardNo = sc.next();
+        System.out.print("Enter cvv of card: ");
+        cvv = sc.nextInt();
+        System.out.print("Enter Expiry Date of card: ");
+        expDate = sc.nextInt();
+    }
+    @Override
+    public void pay(int amt) {
+        System.out.println("----------------------------------------------------------");
+        System.out.println("Paying through CreditCard Charging Rs " + amt);
+        System.out.println("----------------------------------------------------------");
+    }
+}
+
+
+package StrategyDesignPattern;
+
+import java.util.Scanner;
+
+public class BitcoinStrategy implements PaymentStrategy{
+
+    String BitcoinWalletAddress;
+    String BitcoinAmt;
+    Scanner sc = new Scanner(System.in);
+
+    public void getInfo(){
+        System.out.print("Enter Bitcoin Wallet Address: ");
+        BitcoinWalletAddress = sc.next();
+        System.out.print("Enter Bitcoin amount: ");
+        BitcoinAmt = sc.next();
+    }
+    @Override
+    public void pay(int amt) {
+        System.out.println("----------------------------------------------------------");
+        System.out.println("Paying through Bitcoin Charging Rs " + amt);
+        System.out.println("----------------------------------------------------------");
+    }
+}
+
+
+package StrategyDesignPattern;
+
+import java.util.Scanner;
+
+public class payPal implements PaymentStrategy{
+
+    String email_id;
+    String pass;
+    Scanner sc = new Scanner(System.in);
+
+    public void getInfo(){
+        System.out.println("Enter Email ID::");
+        email_id=sc.nextLine();
+        System.out.println("Enter Password::");
+        pass=sc.nextLine();
+    }
+    @Override
+    public void pay(int amt) {
+        System.out.println("----------------------------------------------------------");
+        System.out.println("Paying through payPal Charging Rs " + amt);
+        System.out.println("----------------------------------------------------------");
+    }
+}
+
+
+package StrategyDesignPattern;
+
+import java.util.Scanner;
+
+public class StrategyPatternTestClass {
+    public static void main(String[] args){
+        ShoppingCart cart = new ShoppingCart();
+        Item a1 = new Item("36985210000",80);
+        Item a2 = new Item("31225210000",100);
+        Item a3 = new Item("32365210000",900);
+        Item a4 = new Item("38785210000",810);
+        Item a5 = new Item("36984510000",780);
+        cart.addItem(a1);
+        cart.addItem(a2);
+        cart.addItem(a3);
+        cart.addItem(a4);
+        cart.addItem(a5);
+        int choice;
+        Scanner sc = new Scanner(System.in);
+        do {
+            System.out.println("---Strategy Pattern Design---");
+            System.out.println("1.Credit card");
+            System.out.println("2.Bitcoin");
+            System.out.println("3.Paypal");
+            System.out.println("4.Exit");
+            System.out.print("Enter your choice: ");
+             choice = sc.nextInt();
+
+            switch(choice){
+                case 1:
+                    cart.pay(new CreditCardStrategy());
+                    break;
+                case 2:
+                    cart.pay(new BitcoinStrategy());
+                    break;
+                case 3:
+                    cart.pay(new payPal());
+                    break;
+                case 4:
+                    System.out.println("Exiting the program!");
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+                    break;
+            }
+        }while(choice < 4);
+    }
+}
+
+
+OUTPUT:-
+
+---Strategy Pattern Design---
+1.Credit card
+2.Bitcoin
+3.Paypal
+4.Exit
+Enter your choice: 1
+Enter your name: Dhirj
+Enter your Card number: 2345234654327654
+Enter cvv of card: 000
+Enter Expiry Date of card: 2611
+----------------------------------------------------------
+Paying through CreditCard Charging Rs 2670
+----------------------------------------------------------
+---Strategy Pattern Design---
+1.Credit card
+2.Bitcoin
+3.Paypal
+4.Exit
+Enter your choice: 2
+----------------------------------------------------------
+Paying through Bitcoin Charging Rs 2670
+----------------------------------------------------------
+---Strategy Pattern Design---
+1.Credit card
+2.Bitcoin
+3.Paypal
+4.Exit
+Enter your choice: 3
+----------------------------------------------------------
+Paying through payPal Charging Rs 2670
+----------------------------------------------------------
+---Strategy Pattern Design---
+1.Credit card
+2.Bitcoin
+3.Paypal
+4.Exit
+Enter your choice: 4
+Exiting the program!
+
+Process finished with exit code 0

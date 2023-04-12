@@ -1,0 +1,193 @@
+//23361_Dhiraj Mangaldas Wadile
+//SE-11(G-11)
+//Assignment No.10
+//OOP LAB
+
+
+package FactoryDesignPattern;
+
+public abstract class Car {
+    private CarType model;
+    Car(CarType model){
+        this.model = model;
+    }
+
+    abstract void constructCar();
+}
+
+
+package FactoryDesignPattern;
+
+public class CarFactory {
+    public void buildCar(CarType model){
+        Car c = null;
+
+        switch(model){
+            case Sedan:
+                c = new Sedan(model);
+                break;
+            case SUV:
+                c = new SUV(model);
+                break;
+            case HatchBack:
+                c = new HatchBack(model);
+                break;
+        }
+    }
+}
+
+
+package FactoryDesignPattern;
+
+public enum CarType {
+        HatchBack,Sedan,SUV;
+    }
+
+
+package FactoryDesignPattern;
+
+public class SUV extends Car{
+
+    SUV(CarType model) {
+        super(model);
+        constructCar();
+    }
+
+    @Override
+    void constructCar() {
+        System.out.println("Manufacturing of SUV car");
+        System.out.println("Construction of SUV car is done!!");
+        System.out.println();
+    }
+}
+
+
+package FactoryDesignPattern;
+
+public class Sedan extends Car{
+
+    Sedan(CarType model) {
+        super(model);
+        constructCar();
+    }
+
+    @Override
+    void constructCar() {
+        System.out.println("Manufacturing of Sedan car");
+        System.out.println("Construction of Sedan car is done!!");
+        System.out.println();
+    }
+}
+
+
+package FactoryDesignPattern;
+
+public class HatchBack extends Car{
+    HatchBack(CarType model) {
+        super(model);
+        constructCar();
+    }
+
+    @Override
+    void constructCar() {
+        System.out.println("Manufacturing of HatchBack car");
+        System.out.println("Construction of HatchBack car is done!!");
+        System.out.println();
+    }
+}
+
+
+
+package FactoryDesignPattern;
+
+import java.util.Scanner;
+
+public class TestFactoryPattern {
+
+    int menu(){
+        int choice = 0;
+        System.out.println("---------------------------");
+        System.out.println("1.Sedan");
+        System.out.println("2.SUV");
+        System.out.println("3.HatchBack");
+        System.out.println("4.Exit");
+        System.out.println("---------------------------");
+        return choice;
+    }
+    public static void main(String [] args){
+        int choice = 0;
+        Scanner sc = new Scanner(System.in);
+        TestFactoryPattern ob = new TestFactoryPattern();
+        CarFactory obj = new CarFactory();
+
+        do{
+            System.out.println("-------Factory Design Pattern-------");
+            ob.menu();
+            System.out.print("\nEnter your choice to construct a car: ");
+            choice = sc.nextInt();
+
+            switch (choice){
+                case 1:
+                    obj.buildCar(CarType.Sedan);
+                    break;
+                case 2:
+                    obj.buildCar(CarType.SUV);
+                    break;
+                case 3:
+                    obj.buildCar(CarType.HatchBack);
+                    break;
+            }
+        }while(choice < 4);
+    }
+}
+
+
+OUTPUT:-
+
+-------Factory Design Pattern-------
+---------------------------
+1.Sedan
+2.SUV
+3.HatchBack
+4.Exit
+---------------------------
+
+Enter your choice to construct a car: 1
+Manufacturing of Sedan car
+Construction of Sedan car is done!!
+
+-------Factory Design Pattern-------
+---------------------------
+1.Sedan
+2.SUV
+3.HatchBack
+4.Exit
+---------------------------
+
+Enter your choice to construct a car: 2
+Manufacturing of SUV car
+Construction of SUV car is done!!
+
+-------Factory Design Pattern-------
+---------------------------
+1.Sedan
+2.SUV
+3.HatchBack
+4.Exit
+---------------------------
+
+Enter your choice to construct a car: 3
+Manufacturing of HatchBack car
+Construction of HatchBack car is done!!
+
+-------Factory Design Pattern-------
+---------------------------
+1.Sedan
+2.SUV
+3.HatchBack
+4.Exit
+---------------------------
+
+Enter your choice to construct a car: 4
+
+Process finished with exit code 0
