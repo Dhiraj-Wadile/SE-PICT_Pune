@@ -1,0 +1,159 @@
+1. List name of all students who have registered for courses in more than 
+one department.
+2. List name and SSN of all students who have registered for more than 
+one course in a specified department.
+3. List name of all students who have got at least B grade in all the courses 
+taken by him/her.
+4. List name of all students who have got A in all the courses offered by 
+CS department.
+5. List the highest grade obtained in each course by students majoring in 
+each of the departments.
+
+
+Queries:-
+
+-- Create Students table
+CREATE TABLE students (
+  student_id INT PRIMARY KEY,
+  name VARCHAR(50),
+  ssn VARCHAR(11) UNIQUE,
+  address VARCHAR(100),
+  phone VARCHAR(15),
+  birthdate DATE,
+  major_department VARCHAR(50),
+  degree_program VARCHAR(10)
+);
+
+-- Create Departments table
+CREATE TABLE departments (
+  department_code VARCHAR(10) PRIMARY KEY,
+  name VARCHAR(50),
+  office_number VARCHAR(20),
+  office_phone VARCHAR(15),
+  college VARCHAR(50)
+);
+
+-- Create Courses table
+CREATE TABLE courses (
+  course_number INT,
+  course_name VARCHAR(100),
+  description VARCHAR(200),
+  department_code VARCHAR(10),
+  quarter_hours_credit INT,
+  PRIMARY KEY (course_number, department_code),
+  FOREIGN KEY (department_code) REFERENCES departments(department_code)
+);
+
+-- Create Sections table
+CREATE TABLE sections (
+  section_number INT,
+  instructor VARCHAR(50),
+  semester VARCHAR(20),
+  year INT,
+  course_number INT,
+  department_code VARCHAR(10),
+  PRIMARY KEY (section_number, course_number, department_code),
+  FOREIGN KEY (course_number, department_code) REFERENCES courses(course_number, department_code)
+);
+
+-- Create Grades table
+CREATE TABLE grades (
+  student_id INT,
+  section_number INT,
+  grade CHAR(1),
+  PRIMARY KEY (student_id, section_number),
+  FOREIGN KEY (student_id) REFERENCES students(student_id),
+  FOREIGN KEY (section_number) REFERENCES sections(section_number)
+);
+
+
+
+-- Insert data into Students table
+INSERT INTO students (student_id, name, ssn, address, phone, birthdate, major_department, degree_program)
+VALUES
+  (1, 'John Doe', '123456789', '123 Main St', '555-1234', '2000-01-01', 'Computer Science', 'B.S.'),
+  (2, 'Jane Smith', '987654321', '456 Elm St', '555-5678', '1999-05-15', 'Physics', 'B.S.'),
+  (3, 'Alice Johnson', '654321987', '789 Oak St', '555-4321', '2001-07-10', 'Biology', 'B.A.');
+
+-- Insert data into Departments table
+INSERT INTO departments (department_code, name, office_number, office_phone, college)
+VALUES
+  ('CS', 'Computer Science', 'CS101', '555-1111', 'School of Engineering'),
+  ('PHY', 'Physics', 'PHY201', '555-2222', 'School of Science'),
+  ('BIO', 'Biology', 'BIO301', '555-3333', 'School of Science');
+
+-- Insert data into Courses table
+INSERT INTO courses (course_number, course_name, description, department_code, quarter_hours_credit)
+VALUES
+  (1, 'Introduction to Computer Science', 'Introduction to programming and problem-solving.', 'CS', 3),
+  (2, 'Quantum Mechanics', 'Fundamentals of quantum mechanics.', 'PHY', 4),
+  (3, 'Cell Biology', 'Study of cellular structures and functions.', 'BIO', 3),
+  (4, 'Data Structures', 'Implementation and analysis of data structures.', 'CS', 3);
+
+-- Insert data into Sections table
+INSERT INTO sections (section_number, instructor, semester, year, course_number, department_code)
+VALUES
+  (101, 'Dr. Smith', 'Fall', 2022, 1, 'CS'),
+  (201, 'Prof. Johnson', 'Spring', 2023, 2, 'PHY'),
+  (301, 'Dr. Lee', 'Fall', 2022, 3, 'BIO'),
+  (102, 'Dr. Smith', 'Spring', 2023, 1, 'CS');
+
+-- Insert data into Grades table
+INSERT INTO grades (student_id, section_number, grade)
+VALUES
+  (1, 101, 'A'),
+  (1, 102, 'B'),
+  (2, 201, 'A'),
+  (3, 301, 'B'),
+  (3, 101, 'A');
+
+
+--1.List name of all students who have registered for courses in more than one department.
+
+SELECT s.name
+FROM students s
+JOIN grades g ON s.student_id = g.student_id
+JOIN sections sec ON g.section_number = sec.section_number
+GROUP BY s.student_id
+HAVING COUNT(DISTINCT sec.department_code) > 1;
+
+--2.List name and SSN of all students who have registered for more than one course in a specified department. (Replace 'SPECIFIED_DEPARTMENT_CODE' with the desired department code)
+
+SELECT s.name, s.ssn
+FROM students s
+JOIN grades g ON s.student_id = g.student_id
+JOIN sections sec ON g.section_number = sec.section_number
+WHERE sec.department_code = 'BIO'
+GROUP BY s.student_id
+HAVING COUNT(*) > 1;
+
+--3.List name of all students who have got at least a B grade in all the courses taken by him/her.
+
+SELECT s.name
+FROM students s
+JOIN grades g ON s.student_id = g.student_id
+WHERE g.grade IN ('A', 'B', 'C', 'D')
+GROUP BY s.student_id
+HAVING MIN(g.grade) = 'B';
+
+--4.List name of all students who have got an A in all the courses offered by the CS department.
+
+SELECT s.name
+FROM students s
+JOIN grades g ON s.student_id = g.student_id
+JOIN sections sec ON g.section_number = sec.section_number
+WHERE sec.department_code = 'CS'
+GROUP BY s.student_id
+HAVING COUNT(*) = SUM(g.grade = 'A');
+
+--5.List the highest grade obtained in each course by students majoring in each of the departments.
+
+SELECT d.name AS department, c.course_name, MAX(g.grade) AS highest_grade
+FROM departments d
+JOIN sections sec ON d.department_code = sec.department_code
+JOIN courses c ON sec.course_number = c.course_number
+LEFT JOIN grades g ON sec.section_number = g.section_number
+GROUP BY d.name, c.course_name;
+
+
+

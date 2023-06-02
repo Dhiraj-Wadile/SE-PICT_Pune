@@ -1,0 +1,164 @@
+1. Print the names of all employees who work on the 10th floor and 
+make less than Rs. 50,000.
+2. Print the names of all managers who manage three or more 
+departments on the same floor.
+3. Write a procedure to Give every employee who works in the toy 
+department a 10 percent raise.
+4. Print the names and salaries of employees who work in both the toy 
+department and the Music department.
+5. Print the names of employees who earn a salary that is either less 
+than Rs. 10,000 or more than Rs. 100,000.
+6. Print all of the attributes for employees who work in some 
+department that employee Abhishek also works in.
+7. Print the names of employees who make more than Rs. 20,000 and 
+work in either the video department or the toy department.
+8. Print the name of each employee who earns more than the manager 
+of the department that he or she works in.
+9. Print the name of each department that has a manager whose last 
+name is pantamabe and who is neither the highest-paid nor the 
+lowest-paid employee in the department.
+10.Write a Procedure to Print the names of all employees who work on 
+the floor(s) where Amar Arora works.
+11.Write a trigger to update department id from department, 
+corresponding table must be reflected accordingly.
+
+Queries:-
+
+-- Create the "Emp" table
+
+CREATE TABLE Emp (
+    eid INT PRIMARY KEY,
+    ename VARCHAR(255),
+    salary FLOAT
+);
+
+-- Create the "Dept" table
+
+CREATE TABLE Dept (
+    did INT PRIMARY KEY,
+    dname VARCHAR(255),
+    managerid INT,
+    floornum INT,
+		FOREIGN KEY(managerid) REFERENCES Emp(eid)
+);
+
+-- Create the "Works" table
+
+CREATE TABLE Works (
+    eid INT,
+    did INT,
+    FOREIGN KEY (eid) REFERENCES Emp(eid) ON UPDATE CASCADE,
+    FOREIGN KEY (did) REFERENCES Dept(did) ON UPDATE CASCADE
+);
+
+
+-- INSERTING INTO TABLE
+
+INSERT INTO Emp (eid, ename, salary)
+VALUES
+    (1, 'John Doe', 5000),
+    (2, 'Jane Smith', 6000),
+    (3, 'Michael Johnson', 5500),
+    (4, 'Emily Brown', 4800),
+    (5, 'David Wilson', 5200),
+    (6, 'Sophia Davis', 5900),
+    (7, 'Daniel Lee', 5100),
+    (8, 'Olivia Taylor', 5600),
+    (9, 'William Martinez', 5300),
+    (10, 'Ava Anderson', 5400);
+
+INSERT INTO Dept (did, dname, managerid, floornum)
+VALUES
+    (101, 'HR', 6, 3),
+    (102, 'Finance', 6, 3),
+    (103, 'Sales', 6, 3),
+    (104, 'IT', 6, 3),
+    (105, 'Marketing', 7, 1),
+    (106, 'Operations', 3, 2),
+    (107, 'Research and Development', 1, 5),
+    (108, 'Customer Support', 2, 4),
+    (109, 'Production', 8, 1),
+    (110, 'Quality Assurance', 10, 5);
+
+INSERT INTO Works (eid, did)
+VALUES
+    (1, 101),
+    (1, 102),
+    (2, 102),
+    (3, 101),
+    (3, 103),
+    (4, 104),
+    (5, 110),
+    (6, 101),
+    (7, 105),
+    (8, 106);
+
+//QUERIES
+
+1)
+select ename from emp natural join works natural join dept where floornum=5 and salary < 6000;
+
+
+2)
+select managerid,floornum from dept group by floornum,managerid having count(*)>2;
+
+//emplyoee working in different dept on same floor
+select ename,floornum from emp natural join works natural join dept group by works.eid,floornum having count(did)>1;
+
+3)
+UPDATE emp set salary=salary*1.1 WHERE eid in ( select eid from works  , dept where dept.did = works.did and dname="HR");
+//with procedure
+create procedure saliinc()
+begin
+ UPDATE emp set salary=salary*1.1 WHERE eid in ( select eid from works  , dept where dept.did = works.did and dname="HR");
+end
+
+	
+4)
+SELECT e.ename AS EmployeeName, e.salary AS Salary
+FROM Emp e, Works w1, Dept d1, Works w2, Dept d2
+WHERE e.eid = w1.eid
+AND w1.did = d1.did
+AND e.eid = w2.eid
+AND w2.did = d2.did
+AND d1.dname = 'HR'
+AND d2.dname = 'Finance';
+
+select ename,salary 
+from emp natural join works natural join dept 
+where dname ='music' or dname = 'toy' 
+group by(eid)
+having count(dname)>1;
+
+5)
+select ename , salary from emp where salary >1000 and salary < 6000;
+
+6)
+select * from emp natural join works natural join dept where dname in(select dname from emp natural join works natural join dept where (ename = "Jane Smith"));
+
+
+7)
+select distinct ename from emp  natural join works natural join dept where salary > 10 and (dname = 'HR' or dname='Finance');
+select ename from emp  natural join works natural join dept where salary > 10 and (dname = 'HR' or dname='Finance');
+
+
+8)
+
+10)
+select * from emp natural join works natural join dept where floornum in(select floornum from emp natural join works natural join dept where (ename = "John Doe"));
+
+
+#EXTRA
+select * from emp where  salary != (select max(salary) from emp ) and salary != (select min(salary) from emp);
+
+11)CREATE TRIGGER update_department_id_trigger
+AFTER UPDATE ON Dept
+FOR EACH ROW
+BEGIN
+-- Update the department ID in the Works table for the affected department
+UPDATE Works SET did = NEW.did WHERE did = OLD.did;
+
+-- Update the department ID in any other related tables, if applicable
+
+END;
+ //
