@@ -1,0 +1,159 @@
+
+1. Display the date on which each worker is going to end his presently
+assigned job.
+2. Display how many days remain for each worker to finish his job.
+3. Display the STARTING_DATE in the following format - 'The fifth day of
+month of October, 2004'.
+4. Change the status to 'Complete' for all those jobs, which started in year
+5. 
+6. What is total number of days allocated for printing on the goods for all the
+workers together.
+7. Which workers receive higher than average wage per hour.
+8. Display details of workers who are working on more than one job.
+9. Which workers having specialization in polishing start their job in
+September?
+10. Display details of workers who are specialized in the same field as that of
+Mr.Cacophonix or have a wage per hour more than any of the workers.
+11. Display job details of all those jobs where at least 25 workers are
+working.
+12. Display all those jobs that are already incompleted.
+13. Find all the jobs, which begin within the next two weeks.
+14. List all workers who have their wage per hour ten times greater than the
+wage of their managers.
+15. List the names of workers who have been assigned the job of Packing.
+16. Find the names of the workers who are getting more then 50 Rs. as wages
+per hour.
+17. Find the jobs which are assigned after 31-DEC-2008.
+
+//creation of tables
+
+CREATE TABLE WORKER (
+worker_id INT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+wage_per_hour DECIMAL(10, 2) CHECK (wage_per_hour >= 0),
+specialized_in VARCHAR(255),
+manager_id INT
+);
+
+
+CREATE TABLE JOB (
+job_id INT PRIMARY KEY,
+type_of_job VARCHAR(255),
+status VARCHAR(255)
+);
+
+
+CREATE TABLE JOB_ASSIGNED (
+worker_id INT,
+job_id INT,
+starting_date DATE,
+number_of_days INT,
+FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id),
+FOREIGN KEY (job_id) REFERENCES JOB(job_id)
+);
+
+//INSERTION 
+
+INSERT INTO WORKER (worker_id, name, wage_per_hour, specialized_in, manager_id) VALUES 
+(1, 'John Doe', 10.50, 'Carpentry', 2),
+(2, 'Jane Smith', 15.25, 'Painting', 3),
+(3, 'Michael Johnson', 12.75, 'Polishing', 4),
+(4, 'Sarah Williams', 14.00, 'Polishing', 2),
+(5, 'David Brown', 9.75, 'Carpentry', 3);
+
+INSERT INTO JOB (job_id, type_of_job, status) VALUES 
+(101, 'Construction', 'Incomplete'),
+(102, 'Painting', 'Incomplete'),
+(103, 'Polishing', 'Complete'),
+(104, 'Carpentry', 'Incomplete');
+
+
+INSERT INTO JOB_ASSIGNED (worker_id, job_id, starting_date, number_of_days) VALUES (1, 101, '2023-05-28', 10),
+(2, 102, '2023-06-01', 7),
+(3, 103, '2023-05-15', 5),
+(4, 101, '2023-05-30', 12),
+(5, 104, '2023-06-05', 8);
+
+
+
+//QUERIES
+
+1)
+select name,starting_date+ INTERVAL number_of_days Day from worker natural join Job_assigned;
+
+// for adding days mention DAY for months MONTH and for year YEAR
+
+select name,starting_date+ INTERVAL number_of_days MONTH from worker natural join Job_assigned;
+
+2)
+
+select name,starting_date,((starting_date+ INTERVAL number_of_days DAY)-CURDATE()) as remain_day from worker natural join Job_assigned;
+
+
+select name,starting_date,((starting_date+ INTERVAL number_of_days DAY)-CURDATE()) as remain_day from worker ,Job_assigned where worker.worker_id=Job_assigned.worker_id;
+
+3)
+
+SELECT CONCAT('The ', WEEKDAY(starting_date)+1, ' day of month of ', DATE_FORMAT(starting_date, '%M, %Y')) AS formatted_starting_date from JOB_ASSIGNED;
+
+Q4)
+update job_assigned join JOB ON JOB.job_id=job_assigned.job_id set status="Complete" where Year(starting_date)=2023;
+
+select * from JOB_assigned;
+
+select * from JOB;
+
+
+Q5)
+
+select sum(number_of_days) as no_of_days,Job.job_id from Job natural join job_assigned  where type_of_job="Painting" group by job_id;
+
+select sum(number_of_days) as no_of_days,Job.job_id from Job natural join job_assigned  where type_of_job="Construction" group by job_id;
+
+
+Q6)
+ select * from worker where wage_per_hour > (select avg(wage_per_hour) from worker);
+
+Q7)   select worker.* from worker natural join job_assigned group by worker_id having count(job_id)>1;
+
+Q8)
+
+
+ select name from worker natural join job_assigned natural join job where type_of_job="Polishing" and MONTH(starting_date)=5;
+
+Q9)
+
+select name from worker where specialized_in ="Polishing" or wage_per_hour > (select min(wage_per_hour) from worker);
+
+Q 10)
+
+select Job.*,count(worker_id) from Job natural join Job_assigned group by job_id having count(worker_id)>1;
+
+Q 11) 
+       select * from job where status="Complete";
+
+Q 12)
+     
+        select * from job natural join job_assigned where starting_date between CURDATE() and CURDATE() + INTERVAL 2 WEEK;
+         //or
+         select * from job natural join job_assigned where starting_date between CURDATE() and CURDATE() + INTERVAL 14 DAY; 
+
+Q 13) 
+select w1.* from worker w1, worker w2 where w2.worker_id = w1.manager_id and w1.wages_per_hour >= 2*w2.wages_per_hour;
+
+Q 14)   
+
+          select name,job.job_id from worker,job,job_assigned where worker.worker_id=job_assigned.worker_id and job_assigned.job_id=job.job_id and type_of_job="Polishing";
+
+Q 15)
+      select name from worker where wage_per_hour>10;
+
+Q 16)
+
+      select job.* from job natural join job_assigned where starting_date > CURDATE();
+
+17)
+
+SELECT *
+FROM JOB_ASSIGNED
+WHERE starting_date > '2008-12-31';
