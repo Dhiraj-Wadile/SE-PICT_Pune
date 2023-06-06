@@ -8,7 +8,7 @@
 void main(void){
 int a[100];                      // Upto 128 no error, error after 128
 int sum=0;
-for(int i=0;i&lt;10;i++){
+for(int i=0;i<10;i++){
 a[i]=2;
 sum+=a[i];
 }
@@ -27,10 +27,10 @@ TRISB=0;
 int data[5] = {10, 20, 30, 40, 50};    //These values stores in file registers 
 int i;
 int sum = 0;
-BSR = 0x01;                    //These for store values in bsr 1 (it default stores in bsr0)
-for (i = 0; i &lt; 5; i++) {
+BSR = 0x00;                    //These for store values in bsr 1 (it default stores in bsr0)
+for (i = 0; i<5; i++) {
 sum += data[i];
 }
-BSR = 0x00;
+BSR = 0x01;
 PORTB = sum;
 }
