@@ -1,0 +1,59 @@
+
+//Assignment 8
+
+#include <pic18f4550.h>
+#define LCD_RS PORTAbits.RA0
+#define LCD_EN PORTAbits.RA1
+
+void delay(){
+    for(int i=0;i<10;i++ )
+        for(int j=0;j<100;j++);
+}
+
+void SendInstruction(unsigned char command){
+    
+LCD_RS = 0;
+PORTB = command;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void SendData (unsigned char data){
+
+LCD_RS = 1;
+PORTB = data;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void main(){
+
+ADCON1 = 0X0F;
+TRISB=0;
+TRISAbits.TRISA0=0;
+TRISAbits.TRISA1=0;
+SendInstruction (0x38);
+SendInstruction (0x01);
+for (int i=0;i<1000;i++)
+delay();
+SendInstruction (0x80);
+
+char *msg="23361";
+while(*msg!='\0')
+{
+    SendData(*msg);
+    msg++;
+}
+for(int i=0;i<1000;i++)
+    delay();
+SendInstruction(0xC0);
+char *msg1="Dhiraj";
+while(*msg!='\0'){
+    SendData(*msg);
+    msg++;
+}
+}

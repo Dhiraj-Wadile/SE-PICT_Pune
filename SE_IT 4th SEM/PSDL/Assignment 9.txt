@@ -1,0 +1,64 @@
+
+//Assignment 9
+
+#include <pic18f4550.h>
+#define LCD_RS PORTAbits.RA0
+#define LCD_EN PORTAbits.RA1
+
+void delay(){
+    for(int i=0;i<10;i++ )
+        for(int j=0;j<100;j++);
+}
+
+void SendInstruction(int command){
+    
+LCD_RS = 0;
+PORTB = command;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void SendData (int data){
+
+LCD_RS = 1;
+PORTB = data;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+int Read_Temp(void){
+ADCON0=0b00011101;
+ADCON0bits.GO_DONE=1;
+while(ADCON0bits.GO_DONE==1);
+return ADRES;
+}
+
+void main(){
+
+ADCON1 = 0X0F;
+TRISB=0;
+TRISAbits.TRISA0=0;
+TRISAbits.TRISA1=0;
+SendInstruction (0x38);
+SendInstruction (0x01);
+for (int i=0;i<100;i++)
+delay();
+SendInstruction (0x80);
+
+unsigned int temp;
+int c=50;
+while(1)
+{
+temp=Read_Temp();
+temp=((temp*500)/1023);
+SendData(temp/10+48);
+SendData(temp%10+48);
+
+for(int i=0;i<100;i++)
+delay();
+}
+}
