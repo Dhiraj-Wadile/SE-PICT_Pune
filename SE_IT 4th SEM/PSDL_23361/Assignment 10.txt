@@ -1,0 +1,52 @@
+// C++ code
+//
+void setup()
+{
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+
+void loop()
+{
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000); // Wait for 1000 millisecond(s)
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000); // Wait for 1000 millisecond(s)
+}
+
+or
+
+// C++ code  resistor 330 ohm
+
+//
+int temp = 0;
+
+void setup()
+{
+  pinMode(A0, INPUT);
+  Serial.begin(9600);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+}
+
+void loop()
+{
+  temp = map(((analogRead(A0) - 20) * 3.043), 0, 1023, -20, 120);
+  Serial.println(temp);
+  if (temp < 30) {
+    digitalWrite(10, HIGH);
+  } else {
+    digitalWrite(10, LOW);
+  }
+  if (temp < 50) {
+    digitalWrite(11, HIGH);
+  } else {
+    digitalWrite(11, LOW);
+  }
+  if (temp < 70) {
+    digitalWrite(12, HIGH);
+  } else {
+    digitalWrite(12, LOW);
+  }
+  delay(10); // Delay a little bit to improve simulation performance
+}

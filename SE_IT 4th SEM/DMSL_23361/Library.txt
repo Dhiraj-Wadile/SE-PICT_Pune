@@ -1,0 +1,104 @@
+Queries:-
+
+-- create a table
+
+CREATE TABLE student 
+(stud_no INTEGER PRIMARY KEY not NULL,stud_name char(10));
+
+CREATE TABLE membership
+(mem_no INTEGER PRIMARY KEY not NULL,stud_no INTEGER,
+FOREIGN KEY(stud_no)REFERENCES student(stud_no));
+
+CREATE TABLE book
+(book_no INTEGER PRIMARY KEY not NULL,book_name char(10),author char(10));
+
+CREATE TABLE iss_rec
+(iss_no INTEGER PRIMARY KEY not NULL,iss_date date,mem_no INTEGER,
+book_no INTEGER,FOREIGN KEY(book_no)REFERENCES book(book_no),
+FOREIGN KEY(mem_no)REFERENCES membership(mem_no));
+
+-- insert some values in students
+
+INSERT INTO student VALUES (34, 'KATE');
+INSERT INTO student VALUES (55, 'JON');
+INSERT INTO student VALUES (05, 'BEN');
+INSERT INTO student VALUES (27, 'OLA');
+
+-- insert values in membership
+
+INSERT INTO membership VALUES (313, 34);
+INSERT INTO membership VALUES (444, 55);
+INSERT INTO membership VALUES (555, 05);
+INSERT INTO membership VALUES (676,27);
+
+-- insert values in book
+
+INSERT INTO book VALUES (3134, 'MATHS','VK RAMAN');
+INSERT INTO book VALUES (1551, 'SCIENCE','CJDATE');
+INSERT INTO book VALUES (1231, 'ELECTRONICS','RAJURAMAN');
+INSERT INTO book VALUES (2771, 'ECONOMICS','JK DUBEY');
+
+-- insert values in iss_rec
+
+INSERT INTO iss_rec VALUES(945,'2021-11-02',313,3134);
+INSERT INTO iss_rec VALUES(231,'2021-11-03',444,1551);
+INSERT INTO iss_rec VALUES(641,'2021-11-09',555,1231);
+INSERT INTO iss_rec VALUES(989,'2021-11-24',676,2771);
+
+
+c)
+
+SELECT student.stud_name,membership.mem_no FROM student,membership where student.stud_no = membership.stud_no;
+
+SELECT student.stud_name,membership.mem_no FROM student inner join
+membership ON student.stud_no=membership.stud_no;
+
+SELECT student.stud_name,membership.mem_no FROM student natural join membership;
+
+
+
+d)
+select iss_no , stud_name , book_name from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no and iss_date='2021-11-02';
+
+select iss_no , stud_name , book_name from student natural join membership natural join iss_rec natural join book where iss_date='2021-11-02';
+
+
+e)
+select stud_name  from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no and author='cjdate';
+
+select  stud_name from student natural join membership natural join iss_rec natural join book where author='CJDATE';
+
+
+f)
+select stud_name , count(iss_no) from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no GROUP BY iss_rec.mem_no;
+
+select  stud_name , count(iss_no) from student natural join membership natural join iss_rec natural join book GROUP BY iss_rec.mem_no
+
+
+g)
+select stud_name , book_name from book,student,membership,iss_rec where student.stud_no = membership.stud_no and membership.mem_no = iss_rec.mem_no and iss_rec.book_no = book.book_no and student.stud_no=5;
+
+select stud_name ,  book_name from student natural join membership natural join iss_rec natural join book where student.stud_no=5;
+
+
+h)
+select book.* from book,iss_rec where  iss_rec.book_no = book.book_no and iss_date='2021-11-02';
+
+select book.* from book natural join iss_rec  where iss_date='2021-11-02' ;
+
+
+i)
+create VIEW v1 as select iss_no , iss_date , stud_name , book_name  from membership, student,iss_rec,book where  student.stud_no = membership.stud_no and membership.mem_no = iss_rec.mem_no and iss_rec.book_no = book.book_no;
+
+create VIEW v11 as select iss_no , iss_date , stud_name , book_name  from  student natural join membership natural join iss_rec natural join book;
+
+
+j) Creating a view that lists the daily issues-date wise for the last one week:
+
+CREATE VIEW LastWeekIssuesView AS
+SELECT Iss_rec.iss_no, Iss_rec.iss_date, Student.Stud_name, Book.book_name
+FROM Iss_rec
+JOIN Membership ON Iss_rec.Mem_no = Membership.Mem_no
+JOIN Student ON Membership.Stud_no = Student.Stud_no
+JOIN Book ON Iss_rec.book_no = Book.book_no
+WHERE iss_date >= CURDATE() - INTERVAL 1 WEEK;

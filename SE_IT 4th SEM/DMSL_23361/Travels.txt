@@ -1,0 +1,162 @@
+Design the suitable ER Diagram and execute following queries.
+a) Create the tables with the appropriate integrity constraints
+b) Insert around 10 records in each of the tables.
+c) Display all the names of male passengers. 
+d) Find the ticket numbers of the passengers whose name start with ‘r’ and 
+ends with ‘h’. 
+e) Find the names of passengers whose age is between 30 and 45. 
+f) Display the sorted list of passenger’s names.
+g) Find the number of tickets booked by a passenger where the number of 
+seats is greater than 1.
+h) Display the Total number of Reservation per bus number.
+Write a procedure to display the ticket numbers and names of all the passenger
+
+
+Queries:-
+
+
+//CREATION OF TABLES
+
+CREATE TABLE Bus (
+     BusNo INT PRIMARY KEY,
+         Source VARCHAR(255),
+         Destination VARCHAR(255),
+         CouchType VARCHAR(255)
+     );
+
+
+
+CREATE TABLE Ticket (
+TicketNo VARCHAR(255) PRIMARY KEY,
+JourneyDate DATE,
+Age INT,
+DepTime VARCHAR(255),
+Sex VARCHAR(255),
+Source VARCHAR(255),
+Destination VARCHAR(255),
+BusNo INT,
+FOREIGN KEY (BusNo) REFERENCES Bus(BusNo)
+);
+
+
+
+CREATE TABLE Passenger (
+TicketNo VARCHAR(255),
+PNRNo VARCHAR(255),
+Age INT,
+Sex VARCHAR(255),
+ContactNo VARCHAR(255),
+Name VARCHAR(255),
+PRIMARY KEY  (PNRNo),
+FOREIGN KEY (TicketNo) REFERENCES Ticket(TicketNo)
+);
+
+
+CREATE TABLE Reservation (
+PNRNo VARCHAR(255),
+JourneyDate DATE,
+ContactNo VARCHAR(255),
+NoOfSeats INT,
+BusNo INT,
+Address VARCHAR(255),
+FOREIGN KEY (BusNo) REFERENCES Bus(BusNo),
+FOREIGN KEY (PNRNo) REFERENCES Passenger(PNRNo)
+);
+
+
+
+CREATE TABLE Cancellation (
+PNRNo VARCHAR(255),
+JourneyDate DATE,
+SeatNo VARCHAR(255),
+ContactNo VARCHAR(255),
+FOREIGN KEY (PNRNo) REFERENCES Reservation(PNRNo)
+);
+
+
+
+//INSERTION INTO TABLES
+
+
+INSERT INTO Bus (BusNo, Source, Destination, CouchType)
+VALUES
+(1, 'City A', 'City B', 'Regular'),
+(2, 'City B', 'City C', 'Luxury'),
+(3, 'City C', 'City D', 'Regular'),
+(4, 'City D', 'City E', 'Regular'),
+(5, 'City E', 'City F', 'Luxury');
+
+
+INSERT INTO Ticket (TicketNo, JourneyDate, Age, DepTime, Sex, Source, Destination, BusNo) VALUES
+('T123', '2023-05-30', 25, '10:00 AM', 'Male', 'City A', 'City B', 1),
+('T456', '2023-06-01', 35, '11:30 AM', 'Female', 'City B', 'City C', 2),
+('T789', '2023-06-02', 45, '12:45 PM', 'Male', 'City C', 'City D', 3),
+('T012', '2023-06-03', 30, '01:30 PM', 'Female', 'City D', 'City E', 4),
+('T345', '2023-06-04', 28, '02:15 PM', 'Male', 'City E', 'City F', 5);
+
+
+INSERT INTO Passenger (TicketNo, PNRNo, Age, Sex, ContactNo, Name)
+VALUES
+('T123', '101', 25, 'Male', '1234567890', 'John Doe'),
+('T456', '102', 35, 'Female', '9876543210', 'Jane Smith'),
+('T789', '103', 45, 'Male', '5555555555', 'Mike Johnson'),
+('T012', '104', 30, 'Female', '1112223333', 'Emily Brown'),
+('T345', '105', 28, 'Male', '4444444444', 'David Wilson');
+
+
+
+INSERT INTO Reservation (PNRNo, JourneyDate, ContactNo, NoOfSeats, BusNo, Address) VALUES
+('101', '2023-05-30', '1234567890', 2, 1, '123 Main St'),
+('102', '2023-06-01', '9876543210', 3, 2, '456 Elm St'),
+('103', '2023-06-02', '5555555555', 1, 3, '789 Oak St'),
+('104', '2023-06-03', '1112223333', 4, 4, '321 Pine St'),
+('105', '2023-06-04', '4444444444', 2, 5, '654 Cedar St');
+
+
+
+INSERT INTO Cancellation (PNRNo, JourneyDate, SeatNo, ContactNo) VALUES
+('101', '2023-05-30', 'A12', '1234567890'),
+('102', '2023-06-01', 'B8', '9876543210'),
+('103', '2023-06-02', 'C5', '5555555555'),
+('104', '2023-06-03', 'D2', '1112223333'),
+('105', '2023-06-04', 'E14', '4444444444');
+
+//QUERIES
+
+c)
+SELECT Name FROM passenger WHERE Sex='Male';
+
+d)
+SELECT TicketNo FROM passenger WHERE Name LIKE "j%h";
+// string before % check and after % at end.
+
+e)
+SELECT Name FROM passenger WHERE age BETWEEN 30 AND 45; 
+// 30 and 45 inclusive
+SELECT Name FROM passenger WHERE age >= 30 AND age <= 45;
+
+f)
+SELECT * FROM passenger ORDER BY Name asc;
+
+g)
+SELECT Name , TicketNo from Ticket Natural Join Passenger Natural Join Reservation WHERE noofseats > 1;
+SELECT  count(TicketNo) from Ticket Natural Join Passenger Natural Join Reservation WHERE noofseats > 1;
+
+h)
+SELECT reservation.PNRNo , count(reservation.PNRNo) from bus NATURAL JOIN reservation GROUP BY(Reservation.busno);
+select reservation.PNRNo, count(reservation.pnrno) from bus INNER JOIN  reservation ON reservation.busno = bus.busno GROUP BY(reservation.pnrno);
+select reservation.PNRNo, count(reservation.pnrno) from bus,reservation WHERE reservation.busno = bus.busno GROUP BY(reservation.pnrno);
+
+i)
+//PROCEDURE
+
+
+delimiter //
+create procedure proc()
+begin
+select name,ticketno from passenger;
+end//
+
+
+call proc();
+//

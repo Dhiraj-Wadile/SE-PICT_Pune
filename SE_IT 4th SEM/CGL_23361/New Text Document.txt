@@ -1,0 +1,1 @@
+g++ dummy.cpp -lglut -lGL -lGLEW -lGLU -o OpenGLExample

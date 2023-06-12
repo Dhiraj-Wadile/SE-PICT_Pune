@@ -1,0 +1,463 @@
+#Final Assignment
+
+//Assignment 1
+
+#include <pic18f458.h>
+#include <stdio.h>
+#include <xc.h>
+
+void main(void){
+TMR0=0x38;
+TMR1=0x2F;
+TMR2=TMR0-TMR1;
+}
+
+or(8bit*)
+
+#include <pic18f458.h>
+#include <stdio.h>
+#include <xc.h>
+
+void main(void){
+TMR1L=0x38;
+TMR1H=0x2F;
+TRISB=0;
+PORTB=TMR1L+TMR1H;
+}
+
+
+//Assignment 2
+
+#include <pic18f458.h>
+#include <stdio.h>
+#include <xc.h>
+
+void main(void){
+int a[100];                      // Upto 128 no error, error after 128
+int sum=0;
+for(int i=0;i&lt;10;i++){
+a[i]=2;
+sum+=a[i];
+}
+TMR0=sum;
+return;
+}
+
+or 
+
+#include <pic18f458.h>
+#include <stdio.h>
+#include <xc.h>
+
+void main(void) {
+TRISB=0;
+int data[5] = {10, 20, 30, 40, 50};    //These values stores in file registers 
+int i;
+int sum = 0;
+BSR = 0x01;                    //These for store values in bsr 1 (it default stores in bsr0)
+for (i = 0; i &lt; 5; i++) {
+sum += data[i];
+}
+BSR = 0x00;
+PORTB = sum;
+}
+
+//Assignment 3
+
+#include <pic18f458.h>
+#include <stdio.h>
+#include <xc.h>
+
+void main(void) {
+    int choice = 0x0F;
+    TMR1H = 0x0F;
+    TMR1L = 0x04;
+    TRISB = 0x00;
+    TRISC = 0x00;
+
+    while (1) {
+        if (choice = 1) {
+            TMR0 = TMR1L * TMR1H;
+            PORTB = TMR0L;
+            PORTC = TMR0H;
+        }
+        if (choice = 2) {
+            PORTB= TMR1H/TMR1L;
+            PORTC =TMR1H%TMR1L;
+        }
+    }
+    return;
+}
+
+//Assignment 4
+
+#include <pic18f4550.h>
+#include <stdio.h>
+#include <xc.h>
+
+void delay();
+void main(void){
+TRISB = 0;
+
+1. PORTB=0x55;
+// 0xAA : Alternate
+// 0xFF: ALL
+While(1){
+Delay();
+PORTB=~PORTB;
+}
+
+
+2. while(1){      //MSB to LSB
+PORTB=0x00;
+PORTBbits.RB0=1;
+delay();
+PORTBbits.RB0=0;
+PORTBbits.RB1=1;
+delay();
+PORTBbits.RB1=0;
+PORTBbits.RB2=1;
+delay();
+PORTBbits.RB2=0;
+PORTBbits.RB3=1;
+
+delay();
+PORTBbits.RB3=0;
+PORTBbits.RB4=1;
+delay();
+PORTBbits.RB4=0;
+PORTBbits.RB5=1;
+delay();
+PORTBbits.RB5=0;
+PORTBbits.RB6=1;
+delay();
+PORTBbits.RB6=0;
+PORTBbits.RB7=1;
+delay();
+PORTBbits.RB7=0;
+}
+return;
+}
+
+void delay(){
+T0CON = 0x7;
+TMR0 = 18720;
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=1;
+while(INTCONbits.TMR0IF!=1);
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=0;
+return;
+}
+
+//Assignment 5
+
+#include <pic18f4550.h>
+int count = 0;
+int buzzer_on = 0;
+void __interrupt() buzz()
+{
+    if(PIR1bits.TMR1IF ==1)
+    {
+        if(buzzer_on && count == 10)
+        {
+            buzzer_on = 0;
+            PORTAbits.RA5 = 0;
+            count = 0;
+        }
+        if(!buzzer_on && count == 20)
+        {
+            buzzer_on = 1;
+            PORTAbits.RA5 = 1;
+            count = 0;
+        }
+        count++;
+        TMR1 = 28038;
+        PIR1bits.TMR1IF = 0;
+    }
+}
+void main(void) {
+    T1CON = 0XB0;
+    TRISAbits.TRISA5 = 0;
+    PORTAbits.RA5 = 0;
+    PIE1bits.TMR1IE = 1;
+    PIR1bits.TMR1IF = 0;
+    INTCONbits.PEIE = 1;
+    INTCONbits.GIE = 1;
+    T1CONbits.TMR1ON = 1;
+    while(1);
+    return;
+}
+
+or
+
+#include <xc.h>
+#include<pic18f4550.h>
+int count=0;
+int buzzer_on=0;
+void __interrupt() Buzz(){
+    if(PIR1bits.TMR1IF==1){
+        if(buzzer_on && count==10){
+            buzzer_on=0;
+            PORTAbits.RA5=0;
+            count=0;
+        }
+        if(!buzzer_on && count==5){
+            buzzer_on=1;
+            PORTAbits.RA5=1;
+            count=0;
+        }
+        if(buzzer_on && count==10){
+            buzzer_on=0;
+            PORTAbits.RA5=0;
+            count=0;
+        }
+        if(!buzzer_on && count==50){
+            buzzer_on=1;
+            PORTAbits.RA5=1;
+            count=0;
+        }
+        count++;
+        TMR1=28026;
+        TMR1IF=0;
+    }
+}
+void main(void) {
+    T1CON=0XB0;
+    TRISAbits.TRISA5=0;
+    PORTAbits.RA5=0;
+    TRISB=0;
+    PORTB=0;
+    PIE1bits.TMR1IE=1;
+    PIR1bits.TMR1IF=0;
+    INTCONbits.PEIE=1;
+    INTCONbits.GIE=1;
+    T1CONbits.TMR1ON=1;
+    while(1){
+        for(int i=0;i<1000;i++)
+            for(int j=0;j<100;j++);
+            
+            
+        PORTB++;
+        
+    }
+    return;
+}
+
+//Assignment 6
+
+#include <pic18f4550.h>
+#define ll int
+
+void __interrupt() relay(){
+    if(INTCON3bits.INT1IF == 1){
+        INTCONbits.GIE = 0;
+        PORTAbits.RA4 = 1;
+        for(ll i=0; i<1000; i++){
+            for(ll j=0; j<100; j++){
+                
+            }
+        }
+        PORTAbits.RA4 = 0;
+        INTCON3bits.INT1IF = 0;            
+        INTCONbits.GIE = 1;
+    }
+}
+
+void main(void){
+    TRISBbits.RB1 = 1;
+    TRISAbits.RA4 = 0;      //RELAYYYY
+    INTCON3bits.INT1IF = 0;
+    INTCON3bits.INT1IE = 1;
+    INTCON2bits.INTEDG1 = 0;    //Falling Edge
+    INTCONbits.PEIE = 1;
+    INTCONbits.GIE = 1;
+    while(1);
+    
+    return;
+}
+
+//Assignment 7
+
+#include<pic18f4550.h>
+
+void main(void)
+{
+    unsigned int i;
+   
+    TRISCbits.TRISC2    = 0;            //CCP1 pin as output
+   
+    CCP1CON  =   0b00011100;            //Select PWM mode; Duty cycle LSB CCP1CON<4:5> = <1:1>
+   
+    T2CON   =   0b00000010;             //Prescalar = 16; Timer2 OFF
+    GIE=1; //Global Interrupt Enable
+    TRISAbits.TRISA4=0; //PORTA pin4 as output
+    while(1)
+    {
+        TMR2=0;
+        PR2     =   250;   //0x95;  
+        CCPR1L   =   2;    //0x0F;      //Duty cycle 10%
+       
+        TMR2IF=0;
+        TMR2ON = 1;                     //Timer2 ON
+        for(int i=2;i<255;i+=50)
+        {
+            CCPR1L=i; //For Decreasing the speed  
+            for(int j=0;j<1000;j++)
+                for(int k=0;k<10000;k++);
+                PORTAbits.RA4=~PORTAbits.RA4;
+        }
+    }
+}
+
+or
+
+#include <pic18f4550.h>
+
+void main(void)
+{
+    int i;
+    TRISCbits.TRISC2 = 0;   //DC Connection
+    CCP1CON = 0x0C;         //Set CCp Module in PWM Mode
+    T2CON = 0;              //We use this because we need to set specific values to PR2 present in TMR2
+    TRISAbits.TRISA4 = 0;   //Relay --> Just to visualize changes
+    while(1)
+    {
+        TMR2 = 0;                                   //Use mandatorily because we can't use PR2 without TMR2
+        PR2 = 250;                                  //Max->255
+        PIR1bits.TMR2IF = 0;                        //Mandatory step...further procedure is carried out automatically
+        TMR2ON = 1;                                 //Turn on TMR2
+        for(i=250; i>0; i-=50)                      //Loop to change Duty Cycle(inversely related to speed)
+        {
+            CCPR1L = i;                             //PWN Duty Cycle-->This Changes the speed of DC Motor
+            for(int j=0; j<3000; j++)               //Delay Generation
+                for(int k=0; k<1000; k++);
+                PORTAbits.RA4 ^= PORTAbits.RA4;     //ToggleRelay
+        }
+    }
+}
+
+
+//Assignment 8
+
+#include <pic18f4550.h>
+#define LCD_RS PORTAbits.RA0
+#define LCD_EN PORTAbits.RA1
+
+void delay(){
+    for(int i=0;i<10;i++ )
+        for(int j=0;j<100;j++);
+}
+
+void SendInstruction(unsigned char command){
+    
+LCD_RS = 0;
+PORTB = command;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void SendData (unsigned char data){
+
+LCD_RS = 1;
+PORTB = data;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void main(){
+
+ADCON1 = 0X0F;
+TRISB=0;
+TRISAbits.TRISA0=0;
+TRISAbits.TRISA1=0;
+SendInstruction (0x38);
+SendInstruction (0x01);
+for (int i=0;i<1000;i++)
+delay();
+SendInstruction (0x80);
+
+char *msg="23361";
+while(*msg!='\0')
+{
+    SendData(*msg);
+    msg++;
+}
+for(int i=0;i<1000;i++)
+    delay();
+SendInstruction(0xC0);
+char *msg1="Dhiraj";
+while(*msg!='\0'){
+    SendData(*msg);
+    msg++;
+}
+}
+
+
+//Assignment 9
+
+#include <pic18f4550.h>
+#define LCD_RS PORTAbits.RA0
+#define LCD_EN PORTAbits.RA1
+
+void delay(){
+    for(int i=0;i<10;i++ )
+        for(int j=0;j<100;j++);
+}
+
+void SendInstruction(int command){
+    
+LCD_RS = 0;
+PORTB = command;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+void SendData (int data){
+
+LCD_RS = 1;
+PORTB = data;
+LCD_EN =1;
+delay();
+LCD_EN = 0;
+delay();
+}
+
+int Read_Temp(void){
+ADCON0=0b00011101;
+ADCON0bits.GO_DONE=1;
+while(ADCON0bits.GO_DONE==1);
+return ADRES;
+}
+
+void main(){
+
+ADCON1 = 0X0F;
+TRISB=0;
+TRISAbits.TRISA0=0;
+TRISAbits.TRISA1=0;
+SendInstruction (0x38);
+SendInstruction (0x01);
+for (int i=0;i<100;i++)
+delay();
+SendInstruction (0x80);
+
+unsigned int temp;
+int c=50;
+while(1)
+{
+temp=Read_Temp();
+temp=((temp*500)/1023);
+SendData(temp/10+48);
+SendData(temp%10+48);
+
+for(int i=0;i<100;i++)
+delay();
+}
+}

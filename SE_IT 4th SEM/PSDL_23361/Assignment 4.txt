@@ -1,0 +1,128 @@
+
+//Assignment 4
+
+#include <pic18f4550.h>
+#include <stdio.h>
+#include <xc.h>
+
+void delay();
+void main(void){
+TRISB = 0;
+
+PORTB=0xAA;
+while(1){
+delay();
+PORTB=~PORTB;
+}
+return;
+}
+
+void delay(){
+T0CON = 0x7;
+TMR0 = 18720;
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=1;
+while(INTCONbits.TMR0IF!=1);
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=0;
+return;
+}
+
+
+or
+
+//Assignment 4
+
+#include <pic18f4550.h>
+#include <stdio.h>
+#include <xc.h>
+
+void delay();
+void main(void){
+TRISB = 0;
+
+
+while(1){      //MSB to LSB
+PORTB=0x00;
+PORTBbits.RB0=1;
+delay();
+PORTBbits.RB0=0;
+PORTBbits.RB1=1;
+delay();
+PORTBbits.RB1=0;
+PORTBbits.RB2=1;
+delay();
+PORTBbits.RB2=0;
+PORTBbits.RB3=1;
+
+delay();
+PORTBbits.RB3=0;
+PORTBbits.RB4=1;
+delay();
+PORTBbits.RB4=0;
+PORTBbits.RB5=1;
+delay();
+PORTBbits.RB5=0;
+PORTBbits.RB6=1;
+delay();
+PORTBbits.RB6=0;
+PORTBbits.RB7=1;
+delay();
+PORTBbits.RB7=0;
+}
+return;
+}
+
+void delay(){
+T0CON = 0x7;
+TMR0 = 18720;
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=1;
+while(INTCONbits.TMR0IF!=1);
+INTCONbits.TMR0IF=0;
+T0CONbits.TMR0ON=0;
+return;
+}
+
+OR
+
+#include <xc.h>
+#include <pic18f4550.h>
+
+// Function to introduce a delay in seconds
+void delay(unsigned int seconds) {
+    // Loop for the specified number of seconds
+    for (unsigned int i = 0; i < seconds; i++) {
+        // Configure Timer0
+        T0CON = 0x07;  // Set the Timer0 control register with desired settings
+        TMR0 = 18661;  // Set the initial value of Timer0
+        INTCONbits.TMR0IF = 0;  // Clear the Timer0 interrupt flag
+        T0CONbits.TMR0ON = 1;   // Turn on Timer0
+
+        // Wait until Timer0 overflow occurs (delay completion)
+        while (INTCONbits.TMR0IF == 0)
+            ;
+    }
+}
+
+void main(void) {
+    TRISB = 0x00;                  // Set PORTB as output
+    PORTB = 0x01;                  // Turn on LED1 initially
+    unsigned int futureValue = 2;  // Used to store the next value for PORTB
+
+    while (1) {
+        while (PORTB != 0xFF) {
+            delay(1);
+            futureValue *= 2;         // Double the future value
+            PORTB = futureValue - 1;  // Set PORTB to the future value minus 1
+        }
+
+        while (PORTB != 0x01) {
+            delay(1);
+            futureValue /= 2;         // Halve the future value
+            PORTB = futureValue - 1;  // Set PORTB to the future value minus 1
+        }
+    }
+}
+
+

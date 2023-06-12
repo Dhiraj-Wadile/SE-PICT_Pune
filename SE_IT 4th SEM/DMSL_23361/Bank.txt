@@ -1,0 +1,206 @@
+a)List the details of account holders who have a ‘savings’ account.
+b) List the Name and address of account holders with loan amount 
+more than 50,000.
+c) Change the name of the customer to ‘ABC’ whose account 
+number is ’TU001’
+d) List the account number with total deposit more than 80,000.
+e)List the number of fixed deposit accounts in the bank.
+f) Display the details of customers who created their accounts 
+between ’20-jan-08’ to ’20-aug-08’.
+g) Display the detailed transactions on 28th Aug, 2008.
+h) Display the total amount deposited and withdrawn on 29th Aug, 
+2008.
+i) List the details of customers who have a loan.
+j) Write a procedures to display Savings and Loan information of all 
+customers.
+k) Write a trigger to delete the customer.
+
+Queries:-
+
+
+-- CREATION OF TABLES
+
+CREATE TABLE Customer (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    address VARCHAR(100),
+    age INT,
+    contact_number VARCHAR(20),
+    email_id VARCHAR(50)
+);
+
+
+CREATE TABLE Account (
+    account_number VARCHAR(10) PRIMARY KEY,
+    customer_id INT,
+    account_type VARCHAR(20),
+    date_of_creation DATE,
+    balance DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+);
+
+
+CREATE TABLE Transaction (
+    transaction_id INT PRIMARY KEY,
+    account_number VARCHAR(10),
+    amount DECIMAL(10, 2),
+    transaction_date DATE,
+		transaction_type VARCHAR(20),
+    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+);
+
+
+CREATE TABLE Loan (
+    loan_id INT PRIMARY KEY,
+    account_number VARCHAR(10),
+    loan_amount DECIMAL(10, 2),
+    loan_date DATE,
+    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+);
+
+
+--INSERT VALUES
+
+
+INSERT INTO Customer (customer_id, customer_name, address, age, contact_number, email_id)
+VALUES
+    (1, 'John Doe', '123 Main St, City', 35, '555-1234', 'johndoe@email.com'),
+    (2, 'Jane Smith', '456 Elm St, Town', 28, '555-5678', 'janesmith@email.com'),
+    (3, 'Mike Johnson', '789 Oak St, Village', 42, '555-9012', 'mikejohnson@email.com'),
+    (4, 'Sarah Wilson', '321 Pine St, County', 31, '555-3456', 'sarahwilson@email.com'),
+    (5, 'David Brown', '654 Cedar St, District', 39, '555-7890', 'davidbrown@email.com'),
+    (6, 'Lisa Davis', '987 Walnut St, Borough', 26, '555-2345', 'lisadavis@email.com'),
+    (7, 'Robert Taylor', '258 Maple St, Township', 33, '555-6789', 'roberttaylor@email.com');
+
+
+INSERT INTO Account (account_number, customer_id, account_type, date_of_creation, balance)
+VALUES
+    ('A001', 1, 'savings', '2022-01-01', 5000.00),
+    ('A002', 2, 'fixed account', '2021-07-15', 10000.00),
+    ('A003', 3, 'monthly account', '2023-03-10', 2000.00),
+    ('A004', 4, 'savings', '2022-11-30', 8000.00),
+    ('A005', 5, 'savings', '2022-06-20', 15000.00),
+    ('A006', 6, 'monthly account', '2023-02-05', 3000.00),
+    ('A007', 7, 'fixed account', '2021-12-12', 12000.00);
+
+
+INSERT INTO Transaction (transaction_id, account_number, amount, transaction_date, transaction_type)
+VALUES
+    (101, 'A001', 1000.00, '2023-05-28','WITHDRAWL'),
+    (102, 'A002', 5000.00, '2023-05-28','DEPOSIT'),
+    (103, 'A003', 200.00, '2023-05-27','WITHDRAWL'),
+    (104, 'A004', 3000.00, '2023-05-26','DEPOSIT'),
+    (105, 'A005', 2000.00, '2023-05-25','WITHDRAWL'),
+    (106, 'A006', 500.00, '2023-05-25','DEPOSIT'),
+		(107, 'A006', 500.00, '2023-05-25','WITHDRAWL'),
+		(108, 'A006', 1500.00, '2023-05-22','DEPOSIT'),
+		(109, 'A007', 5090.00, '2023-01-21','WITHDRAWL'),
+    (110, 'A007', 10000.00, '2023-02-14','DEPOSIT');
+
+
+INSERT INTO Loan (loan_id, account_number, loan_amount, loan_date)
+VALUES
+    (1, 'A002', 7500.00, '2023-04-15'),
+    (2, 'A004', 20000.00, '2023-03-20'),
+    (3, 'A007', 50000.00, '2023-02-10'),
+    (4, 'A001', 10000.00, '2023-01-05'),
+    (5, 'A005', 30000.00, '2023-06-30'),
+    (6, 'A003', 15000.00, '2023-08-18'),
+		(7, 'A004', 1500.00, '2023-09-18'),
+		(8, 'A006', 1000.00, '2022-01-18'),
+    (9, 'A006', 25000.00, '2023-07-12');
+
+// QUERIES
+
+ a)
+select customer.* from customer NATURAL JOIN account WHERE account_type = "savings";
+
+select customer.*  from customer , account where customer.customer_id = account.customer_id and account_type='savings';
+
+
+b)
+select customer_name , address from customer natural join account natural join loan where loan_amount > 10000;
+
+select customer_name,address,loan_amount from Loan,Account,Customer where Customer.customer_id=Account.customer_id and Loan.Account_number=Account.account_number and  loan_amount>10000;
+
+
+c)
+update Customer,Account  set customer_name="ABC" where Customer.customer_id=Account.customer_id and account_number="A001";
+
+
+d)
+SELECT account_number
+FROM Transaction
+WHERE transaction_type = 'DEPOSIT'
+GROUP BY account_number
+HAVING SUM(amount) > 3000;
+
+
+e)
+select customer.* from customer natural join account where account_type='fixed account';
+
+select count(customer_id) from account where account_type = "fixed account";
+
+
+f)
+select customer.* from customer natural join account WHERE date_of_creation > '2022-01-01'AND date_of_creation < '2023-02-05';
+
+select customer.* from customer natural join account WHERE date_of_creation BETWEEN '2022-01-01'AND '2023-02-05';
+
+
+g)
+select * from transaction where transaction_date = '2023-05-25';
+
+select customer.* from customer natural join account natural join transaction where  transaction_date = '2023-05-25';
+
+
+h)
+SELECT 
+    SUM(CASE WHEN transaction_type='DEPOSIT'  THEN amount ELSE 0 END) AS total_deposit,
+    SUM(CASE WHEN transaction_type='WITHDRAWL'  THEN amount ELSE 0 END) AS total_withdrawl
+FROM Transaction
+WHERE DATE(transaction_date) = '2023-05-25';
+
+
+i)select customer.* from customer natural join account natural join loan;
+
+
+j)
+delimiter // create procedure p1()
+     begin
+      select *  from Customer natural join Loan natural join Account where account_type='savings';
+    end
+     //
+
+k)
+
+CREATE TRIGGER trg_delete_customer
+BEFORE DELETE ON Customer
+FOR EACH ROW
+BEGIN
+    -- Delete associated transactions
+    DELETE FROM Transaction
+    WHERE account_number IN (
+        SELECT account_number
+        FROM Account
+        WHERE customer_id = OLD.customer_id
+    );
+    
+    -- Delete associated loans
+    DELETE FROM Loan
+    WHERE account_number IN (
+        SELECT account_number
+        FROM Account
+        WHERE customer_id = OLD.customer_id
+    );
+
+    -- Delete customer's accounts
+    DELETE FROM Account
+    WHERE customer_id = OLD.customer_id;
+END;
+
+
+
+-- to execute the above trigger -->
+delete from customer where customer_id=1;
+    -> //
