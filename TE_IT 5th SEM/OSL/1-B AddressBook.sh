@@ -50,8 +50,9 @@ delete_record() {     #user to enter the name of the record they want to delete 
 modify_record() {    # Instead of deleting the record, it modifies it. 
                      #The function prompts the user to enter the name of the record they want to modify using the read command. 
                      #It then checks if the name exists in the address book file using grep -q. 
-                     #If it finds the name, it uses grep -v to remove the existing record from the file and stores the result in a temporary file (temp_file). 
-                     #Then, it prompts the user to enter the new name, phone number, email, and address, and appends the modified record to the temporary file. 
+                     #If it finds the name, it uses grep -v to remove the existing record from the file and 
+                     #stores the result in a temporary file (temp_file). Then, it prompts the user to enter 
+                     #the new name, phone number, email, and address, and appends the modified record to the temporary file. 
                      #Finally, it replaces the original address book file with the temporary file using mv, effectively modifying the record.
     echo "Enter the Name of the record to modify: "
     read name_to_modify
@@ -78,7 +79,8 @@ modify_record() {    # Instead of deleting the record, it modifies it.
 
 main() {     #It uses a while loop to repeatedly display a list of options to the user, 
              #and then takes user input to choose one of the options.Depending on the chosen option (a-f), 
-             #it calls the corresponding function (create_addressbook, view_addressbook, insert_record, delete_record, modify_record) or exits the program 
+             #it calls the corresponding function 
+             #(create_addressbook, view_addressbook, insert_record, delete_record, modify_record) or exits the program 
              #if the user chooses to exit (f).
     while true; do
         echo -e "\nOptions:"
